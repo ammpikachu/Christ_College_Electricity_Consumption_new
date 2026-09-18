@@ -1,46 +1,54 @@
-import streamlit as st
+import gradio as gr
 import joblib
 
-# Load model and polynomial features
+# Load the trained model
 model = joblib.load("electricity_bill_new.pkl")
+
+# Load polynomial feature transformer
 poly = joblib.load("polynomial_features (1).pkl")
 
-# Page title
-st.title("Electricity Consumption Prediction")
 
-st.write("Enter the required details to predict electricity consumption.")
+def predict_electricity(ac_units, fan_units):
+    try:
+        # Prepare input
+        input_data = [[ac_units, fan_units]]
 
-# AC input
-ac = st.number_input(
-    "AC Usage (hours)",
-    min_value=0.0,
-    max_value=24.0,
-    value=0.0,
-    step=1.0
+        # Transform using polynomial features
+        input_poly = poly.transform(input_data)
+
+        # Predict
+        prediction = model.predict(input_poly)
+
+        return f"Predicted Electricity Consumption: {prediction[0]:.2f}"
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+# Create Gradio interface
+app = gr.Interface(
+    fn=predict_electricity,
+    inputs=[
+        gr.Number(
+            label="AC Units",
+            minimum=0,
+            precision=0
+        ),
+        gr.Number(
+            label="Fan Units",
+            minimum=0,
+            precision=0
+        )
+    ],
+    outputs=gr.Textbox(
+        label="Prediction"
+    ),
+    title="Electricity Consumption Prediction",
+    description="Enter the number of AC and Fan units to predict electricity consumption."
 )
 
-# Fan input
-fan = st.number_input(
-    "Fan Usage (hours)",
-    min_value=0.0,
-    max_value=24.0,
-    value=0.0,
-    step=1.0
+# Start Gradio
+app.launch(
+    server_name="0.0.0.0",
+    server_port=7860
 )
-
-# Predict
-if st.button("Predict"):
-
-    # Input data
-    input_data = [[ac, fan]]
-
-    # Apply polynomial transformation
-    input_poly = poly.transform(input_data)
-
-    # Prediction
-    prediction = model.predict(input_poly)
-
-    # Display result
-    st.success(
-        f"Predicted Electricity Consumption: {prediction[0]:.2f}"
-    )
