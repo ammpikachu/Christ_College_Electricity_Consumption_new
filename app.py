@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 import pandas as pd
 import joblib
@@ -81,4 +81,3 @@ else:
             "Predicted Electricity Bill",
             f"₹{prediction[0]:,.2f}"
         )
-```
