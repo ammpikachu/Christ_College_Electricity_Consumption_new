@@ -4,8 +4,8 @@ import pandas as pd
 import joblib
 
 # Load the trained model and polynomial transformer
-model = joblib.load("electricity_bill.pkl")
-poly = joblib.load("polynomial_features.pkl")
+model = joblib.load("electricity_bill_new.pkl")
+poly = joblib.load("polynomial_features(1).pkl")
 
 # Page title
 st.title("⚡ Electricity Bill Prediction")
