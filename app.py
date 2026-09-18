@@ -1,83 +1,43 @@
-
 import streamlit as st
-import pandas as pd
 import joblib
 
-# Load the trained model and polynomial transformer
-model = joblib.load("electricity_bill_new.pkl")
-poly = joblib.load("polynomial_features(1).pkl")
+# Load the trained model
+model = joblib.load("electricity_bill.pkl")
+
+# Load the polynomial feature transformer
+poly = joblib.load("polynomial_features (1).pkl")
 
 # Page title
-st.title("⚡ Electricity Bill Prediction")
+st.title("Electricity Consumption Prediction")
 
-st.write(
-    "Predict your electricity bill based on AC and Fan consumption "
-    "using Polynomial Regression."
+st.write("Enter the required details to predict electricity consumption.")
+
+# Input fields
+temperature = st.number_input(
+    "Temperature",
+    min_value=0.0,
+    max_value=60.0,
+    value=25.0
 )
 
-# -----------------------------
-# AC Units Input
-# -----------------------------
-
-ac_units = st.number_input(
-    "Enter AC Consumption (AC Units)",
-    min_value=-100000.0,
-    max_value=100000.0,
-    value=100.0,
-    step=1.0
+humidity = st.number_input(
+    "Humidity",
+    min_value=0.0,
+    max_value=100.0,
+    value=50.0
 )
 
-# -----------------------------
-# Fan Units Input
-# -----------------------------
+# Prediction button
+if st.button("Predict"):
 
-fan_units = st.number_input(
-    "Enter Fan Consumption (Fan Units)",
-    min_value=-100000.0,
-    max_value=100000.0,
-    value=50.0,
-    step=1.0
-)
+    # Create input data
+    input_data = [[temperature, humidity]]
 
-# -----------------------------
-# Validate Inputs
-# -----------------------------
+    # Transform input using polynomial features
+    input_poly = poly.transform(input_data)
 
-valid_ac = 0 <= ac_units <= 150
-valid_fan = 0 <= fan_units <= 150
+    # Make prediction
+    prediction = model.predict(input_poly)
 
-if not valid_ac or not valid_fan:
-
-    st.error(
-        "⚠️ Min value should be 0 and max value should be 150. "
-        "Please enter a value within this range."
-    )
-
-else:
-
-    # -----------------------------
-    # Prediction
-    # -----------------------------
-
-    if st.button("Predict Bill"):
-
-        # Create DataFrame with the same feature names
-        new_data = pd.DataFrame({
-            "AC_Units": [ac_units],
-            "Fan_Units": [fan_units]
-        })
-
-        # Convert input into polynomial features
-        new_data_poly = poly.transform(new_data)
-
-        # Predict electricity bill
-        prediction = model.predict(new_data_poly)
-
-        # Display success message
-        st.success("Model predicted successfully!")
-
-        # Display predicted bill
-        st.metric(
-            "Predicted Electricity Bill",
-            f"₹{prediction[0]:,.2f}"
-        )
+    # Display result
+    st.success(f"Predicted Electricity Consumption: {prediction[0]:.2f}")
