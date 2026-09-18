@@ -2,7 +2,7 @@ import streamlit as st
 import joblib
 
 # Load the trained model
-model = joblib.load("electricity_bill.pkl")
+model = joblib.load("electricity_bill_new.pkl")
 
 # Load the polynomial feature transformer
 poly = joblib.load("polynomial_features (1).pkl")
