@@ -1,10 +1,8 @@
 import streamlit as st
 import joblib
 
-# Load the trained model
+# Load model and polynomial features
 model = joblib.load("electricity_bill_new.pkl")
-
-# Load the polynomial feature transformer
 poly = joblib.load("polynomial_features (1).pkl")
 
 # Page title
@@ -12,32 +10,37 @@ st.title("Electricity Consumption Prediction")
 
 st.write("Enter the required details to predict electricity consumption.")
 
-# Input fields
-temperature = st.number_input(
-    "Temperature",
+# AC input
+ac = st.number_input(
+    "AC Usage (hours)",
     min_value=0.0,
-    max_value=60.0,
-    value=25.0
+    max_value=24.0,
+    value=0.0,
+    step=1.0
 )
 
-humidity = st.number_input(
-    "Humidity",
+# Fan input
+fan = st.number_input(
+    "Fan Usage (hours)",
     min_value=0.0,
-    max_value=100.0,
-    value=50.0
+    max_value=24.0,
+    value=0.0,
+    step=1.0
 )
 
-# Prediction button
+# Predict
 if st.button("Predict"):
 
-    # Create input data
-    input_data = [[temperature, humidity]]
+    # Input data
+    input_data = [[ac, fan]]
 
-    # Transform input using polynomial features
+    # Apply polynomial transformation
     input_poly = poly.transform(input_data)
 
-    # Make prediction
+    # Prediction
     prediction = model.predict(input_poly)
 
     # Display result
-    st.success(f"Predicted Electricity Consumption: {prediction[0]:.2f}")
+    st.success(
+        f"Predicted Electricity Consumption: {prediction[0]:.2f}"
+    )
